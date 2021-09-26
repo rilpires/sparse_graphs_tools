@@ -3,8 +3,7 @@
 
 void _vector_push_back( vector* v ){
     if( v->size >= v->capacity ){
-        if(v->capacity==0) v->capacity = 1;
-        else v->capacity = 2 * v->capacity;
+        v->capacity = MAX(1,2*v->capacity);
         vector_value* old_values = v->values;
         vector_value* new_values = malloc(sizeof(v->values[0])*(v->capacity) );
         if( old_values ){

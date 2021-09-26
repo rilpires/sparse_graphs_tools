@@ -4,7 +4,6 @@
 
 #include "wiener.h"
 
-#define MIN(a,b) ((a<b)?(a):(b))
 
 
 unsigned short** _adj_matrix( graph *g ){
@@ -160,7 +159,11 @@ int W_floyd_warshall( graph *g  , unsigned short ***p_dists){
 
     adj_matrix = _adj_matrix(g);
 
+    printf("adj_matrix  done\n");
+    
     _fill_dist_matrix(adj_matrix , dists , n );
+    
+    printf("fill_dist_matrix  done\n");
 
     int ret = 0 ;
     for( int i = 0 ; i < n ; i++ ){
@@ -169,7 +172,13 @@ int W_floyd_warshall( graph *g  , unsigned short ***p_dists){
         }
     }
 
-    if(free_later) free(dists);
+    if(free_later){
+        for( int i = 0 ; i < n ; i++ )
+            free(dists[i]);
+        free(dists);
+    }
+    for( int i = 0 ; i < n ; i++ )
+        free(adj_matrix[i]);
     free(adj_matrix);
 
     return 2*ret;
@@ -180,12 +189,12 @@ int W( graph *g ){
 
     _fill_bridges(g);
 
-    for( int bi = 0 ; bi < g->bridges.size ; bi++ ){
-        bridge* b = g->bridges.values[bi].ptr_value;
-        for( int i = 0 ; i < b->vertexes.size ; i++ ){
-            printf("ponte %d tem o vertex %d\n" , bi , b->vertexes.values[i].int_value );
-        }
-    }
+    // for( int bi = 0 ; bi < g->bridges.size ; bi++ ){
+    //     bridge* b = g->bridges.values[bi].ptr_value;
+    //     for( int i = 0 ; i < b->vertexes.size ; i++ ){
+    //         printf("ponte %d tem o vertex %d\n" , bi , b->vertexes.values[i].int_value );
+    //     }
+    // }
 
     vector all_degs2_below = empty_vector , all_degs3_above = empty_vector;
     vector degs3_original_table = empty_vector; // this is all_degs3_above reverted (index->key), so we can fast recover the key from the other
@@ -244,6 +253,7 @@ int W( graph *g ){
         free(aux_adjs[i]);
         free(aux_dists[i]);
     }
+
     free(aux_adjs);
     free(aux_dists);
     vector_free(&all_degs2_below);

@@ -57,3 +57,24 @@ void graph_init( graph* g , int topology , vector* data){
     }
 }
 
+void graph_free( graph* g ){
+    int n = g->adjs.size;
+    int bn = g->bridges.size;
+    for( int i = 0 ; i < n ; i++ ){
+        vector_free( g->adjs.values[i].vec_value );
+        free(g->adjs.values[i].vec_value);
+    }
+    for( int i = 0 ; i < g->bridge_map.size ; i++ ){
+        vector_free( g->bridge_map.values[i].vec_value );
+        free(g->bridge_map.values[i].vec_value);
+    }
+    for( int i = 0 ; i < bn ; i++ ){
+        bridge* br = g->bridges.values[i].ptr_value;
+        vector_free( &br->vertexes );
+        free(br);
+    }
+
+    vector_free( &g->adjs );
+    vector_free( &g->bridge_map );
+    vector_free( &g->bridges );
+}

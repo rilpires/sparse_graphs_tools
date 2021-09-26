@@ -3,10 +3,12 @@
 
 #include "vector.h"
 
+
+
 enum TOPOLOGIES {
-                            // when initializing a graph with graph_init, 'data' is a vector which...
-    TOPOLOGY_CIRCULAR ,     //  .. data[0] is the number of vertexs
-    TOPOLOGY_THETA_GRAPH    //  .. data[0],data[1],...,data[m-1] are the amount of vertex in each of the m-bridges
+                            // when initializing a graph with graph_init, 'data' is a vector in which...
+    TOPOLOGY_CIRCULAR ,     //  ... data[0] is the number of vertexs
+    TOPOLOGY_THETA_GRAPH    //  ... data[0],data[1],...,data[m-1] are the amount of vertex in each of the m-bridges
 };
 
 
@@ -40,5 +42,6 @@ static const graph empty_graph = {
 };
 
 void graph_init( graph* g , int topology , vector* data );
+void graph_free( graph* g );
 
 #endif

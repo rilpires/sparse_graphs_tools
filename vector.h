@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+#define MIN(a,b) ((a<b)?(a):(b))
+#define MAX(a,b) ((a>b)?(a):(b))
+
 struct vector;
 
 // vectors can hold multiple types of value:
