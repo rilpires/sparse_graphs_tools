@@ -286,13 +286,13 @@ int W( graph *g ){
         }
     }
 
-    printf("tcharan!\n");
-    for( int i = 0 ; i < aux_n ; i++ ){
-        for( int j = i ; j < aux_n ; j++ ){
-            printf("%d " , aux_dists[i][j] );
-        }
-        printf("\n");
-    }
+    // printf("aux_dists:\n");
+    // for( int i = 0 ; i < aux_n ; i++ ){
+    //     for( int j = i ; j < aux_n ; j++ ){
+    //         printf("%d " , aux_dists[i][j] );
+    //     }
+    //     printf("\n");
+    // }
 
 
 
@@ -312,24 +312,17 @@ int W( graph *g ){
 
 int W_b( bridge *b1 , int d ){
 
-    int ret = 0;
     int n = b1->vertexes.size;
-    for( int i = 0 ; i < n ; i++ ){
-        for( int j = i+1 ; j < n ; j++ ){
-            ret += MIN( (j-i) , (n-1)+d - (j-i) );
-        }
-    }
+    int k = (n-1+d)/2;
+    k = CLAMP(k,1,n-1);
 
-//    float n = b1->vertexes.size;
-//    float fi = (n-1+d)/2;
-//    int i = fi;
-//
-//    float p1 = (n*i*(i+1))/2;
-//    float p2 = ( n*n - n + d*n )*(n - i - 1);
-//    float p3 = -((d-1-2*n)*(n+i)*(n-1-i))/2;
-//    float p4 = -(2*(n-1)*(n-1)*(n-1) + 3*(n-1)*(n-1) + (n-1))/6;
-//
-//    int ret = p1 + p2 + p3 + p4;
+    int p1 = (n*k*(k+1))/2;
+    int p2 = ( n*n - n + d*n )*( n - k - 1);
+    int p3 = ((1-d-2*n)*(n+k)*(n-k-1))/2;
+    int p4 = SQUARED_SUM(n-1) -2*SQUARED_SUM(k);
+    int teste = SQUARED_SUM(n-1);
+    if( teste < n-1 ) printf("[OVERFLOW]\n");
+    int ret = p1 + p2 + p3 + p4;
 
     return ret;
 }

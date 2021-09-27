@@ -13,17 +13,15 @@ int main( int argc , char **argv ){
 
     graph g = empty_graph;
     vector data = empty_vector;
-    vector_push_back_int(&data,113);
-    vector_push_back_int(&data,115);
-    vector_push_back_int(&data,1111);
-    vector_push_back_int(&data,111);
-    vector_push_back_int(&data,115);
+    vector_push_back_int(&data,622);
+    vector_push_back_int(&data,522);
+    vector_push_back_int(&data,422);
     graph_init( &g , TOPOLOGY_THETA_GRAPH , &data );
 
 
     printf("Starting W_floyd_warshall...\n");
     printf("W_floyd_warshall(g)=%d\n" , W_floyd_warshall( &g , NULL ) );
-    printf("Starting W(g)...");
+    printf("\nStarting W(g)...\n");
     printf("W(g)=%d\n" , W( &g ) );
 
     graph_free( &g );

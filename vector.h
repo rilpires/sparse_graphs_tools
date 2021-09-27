@@ -8,7 +8,9 @@
 
 #define MIN(a,b) ((a<b)?(a):(b))
 #define MAX(a,b) ((a>b)?(a):(b))
+#define CLAMP(x,min,max) (MIN(max,MAX(x,min)))
 #define ABS(a) (((a)>0)?((a)):(-(a)))
+#define SQUARED_SUM(N) (((N)*((N)+1)*(2*(N)+1))/6)
 
 struct vector;
 
