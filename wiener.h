@@ -10,8 +10,8 @@
 
 int W_floyd_warshall( graph *g , unsigned short ***dists );
 int W( graph *g );
-int W_b( bridge *b1 );
-int W_bc( bridge *b1 , bridge *b2 , int d1 , int d2 );
+int W_b( bridge *b1 , int d );
+int W_bc( bridge *b1 , int d1 , int d2 );
 int W_bb( bridge *b1 , bridge *b2 , int da , int db , int dc , int dd );
 
 #endif

@@ -185,6 +185,7 @@ int W_floyd_warshall( graph *g  , unsigned short ***p_dists){
 }
 
 int W( graph *g ){
+    int ret = 0;
     int n = g->adjs.size;
 
     _fill_bridges(g);
@@ -240,8 +241,52 @@ int W( graph *g ){
     }
     _fill_dist_matrix( aux_adjs , aux_dists , aux_n );
 
-    printf("tcharan!\n");
+    for( int i = 0 ; i < aux_n ; i++ )
+    for( int j = i+1 ; j < aux_n ; j++ ){
+        ret += 2*MIN_DIST(aux_dists,i,j);
+    }
 
+    for( int bi = 0 ; bi < g->bridges.size ; bi++ ){
+        bridge* br = g->bridges.values[bi].ptr_value;
+
+        int d;
+        int aux_extremity_0 , aux_extremity_1;
+
+        if( br->extremity_0==-1 && br->extremity_1==-1 ){
+            d = 1;
+        } else {
+            aux_extremity_0 = degs3_original_table.values[br->extremity_0].int_value;
+            aux_extremity_1 = degs3_original_table.values[br->extremity_1].int_value;    
+            d = 2+MIN_DIST(aux_dists,aux_extremity_0,aux_extremity_1);
+        }
+        
+        ret += 2*W_b( br , d );
+        for( int i = 0 ; i < aux_n ; i++ ){
+            int d1 = 1+MIN_DIST(aux_dists,aux_extremity_0,i);
+            int d2 = 1+MIN_DIST(aux_dists,aux_extremity_1,i);
+            ret += 2*W_bc( br , d1 , d2 );
+        }
+    }
+    for( int b1 = 0 ; b1 < g->bridges.size ; b1++ ){
+        for( int b2 = b1+1 ; b2 < g->bridges.size ; b2++ ){
+            bridge* br1 = g->bridges.values[b1].ptr_value;
+            bridge* br2 = g->bridges.values[b2].ptr_value;
+
+
+            int aux_extremity_00 = degs3_original_table.values[br1->extremity_0].int_value;
+            int aux_extremity_01 = degs3_original_table.values[br1->extremity_1].int_value;
+            int aux_extremity_10 = degs3_original_table.values[br2->extremity_0].int_value;
+            int aux_extremity_11 = degs3_original_table.values[br2->extremity_1].int_value;
+
+            int da = 2+MIN_DIST( aux_dists , aux_extremity_00 , aux_extremity_10 );
+            int db = 2+MIN_DIST( aux_dists , aux_extremity_01 , aux_extremity_10 );
+            int dc = 2+MIN_DIST( aux_dists , aux_extremity_00 , aux_extremity_11 );
+            int dd = 2+MIN_DIST( aux_dists , aux_extremity_01 , aux_extremity_11 );
+            ret += 2*W_bb( br1 , br2 , da , db , dc , dd );
+        }
+    }
+
+    printf("tcharan!\n");
     for( int i = 0 ; i < aux_n ; i++ ){
         for( int j = i ; j < aux_n ; j++ ){
             printf("%d " , aux_dists[i][j] );
@@ -249,26 +294,73 @@ int W( graph *g ){
         printf("\n");
     }
 
+
+
     for( int i = 0 ; i < aux_n ; i++ ){
         free(aux_adjs[i]);
         free(aux_dists[i]);
     }
-
     free(aux_adjs);
     free(aux_dists);
     vector_free(&all_degs2_below);
     vector_free(&all_degs3_above);
     vector_free(&degs3_original_table);
+    
+    return ret;
 }
 
 
-int W_b( bridge *b1 ){
+int W_b( bridge *b1 , int d ){
 
+    int ret = 0;
+    int n = b1->vertexes.size;
+    for( int i = 0 ; i < n ; i++ ){
+        for( int j = i+1 ; j < n ; j++ ){
+            ret += MIN( (j-i) , (n-1)+d - (j-i) );
+        }
+    }
+
+//    float n = b1->vertexes.size;
+//    float fi = (n-1+d)/2;
+//    int i = fi;
+//
+//    float p1 = (n*i*(i+1))/2;
+//    float p2 = ( n*n - n + d*n )*(n - i - 1);
+//    float p3 = -((d-1-2*n)*(n+i)*(n-1-i))/2;
+//    float p4 = -(2*(n-1)*(n-1)*(n-1) + 3*(n-1)*(n-1) + (n-1))/6;
+//
+//    int ret = p1 + p2 + p3 + p4;
+
+    return ret;
 }
-int W_bc( bridge *b1 , bridge *b2 , int d1 , int d2 ){
-
+int W_bc( bridge *b1 , int d1 , int d2 ){
+    int ret = 0;
+    int n = b1->vertexes.size;
+    int dx1 = MIN( d1 , n-1+d2);
+    int dx2 = MIN( d2 , n-1+d1);
+    int a = MIN(dx1,dx2);
+    int b = MAX(dx1,dx2);
+    int i = (n-ABS(a-b))/2;
+    int na = n - i;
+    int nb = n - na;
+    ret = 2*a*na + na*na - na;
+    ret += 2*b*nb + nb*nb - nb;
+    ret /= 2;
+    return ret;
 }
 int W_bb( bridge *b1 , bridge *b2 , int da , int db , int dc , int dd ){
+    if( b1->vertexes.size < b2->vertexes.size ){
+        return W_bb(b2,b1,da,dc,db,dd); // when flipping, swap db<=>dc
+    }
 
+    int ret = 0;
+    int n1 = b1->vertexes.size;
+    int n2 = b2->vertexes.size;
+    for( int i = 0 ; i < n2 ; i++ ){
+        int d1 = MIN( da + i , dc + n2 - 1 - i );
+        int d2 = MIN( db + i , dd + n2 - 1 - i );
+        ret += W_bc( b1 , d1 , d2 );
+    }
+    return ret;
 }
 

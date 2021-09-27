@@ -3,7 +3,7 @@
 
 #include "vector.h"
 
-
+#define MIN_DIST(dist_matrix,i,j) ((i<j)?(dist_matrix[i][j]):(dist_matrix[j][i]))
 
 enum TOPOLOGIES {
                             // when initializing a graph with graph_init, 'data' is a vector in which...
