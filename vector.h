@@ -43,8 +43,9 @@ void    vector_push_back_ptr( vector* v , void* new_ptr );
 void*   vector_get_ptr( vector* v , int index );
 void    vector_set_ptr( vector* v , int index , void* new_val );
 
+int     vector_contains( vector* v , int val );
 void    vector_pop_back( vector* v , int amount );
 void    vector_resize( vector* v , int new_size );
-void    vector_free( vector* v );
+void    vector_clean( vector* v );
 
 #endif

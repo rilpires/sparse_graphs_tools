@@ -24,8 +24,10 @@ static const list empty_list = {
 
 void    list_push_back( list* l , int i );
 int     list_pop_back( list* l );
+void    list_push_front( list* l , int i );
+int     list_pop_front( list* l );
 int     list_contains( list* l , int val );
-void    list_free( list* l );
+void    list_clean( list* l );
 
 
 #endif

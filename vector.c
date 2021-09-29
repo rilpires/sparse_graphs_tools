@@ -38,6 +38,12 @@ void    vector_set_ptr( vector* v , int index , void* new_val ){
     v->values[index].ptr_value = new_val;
 }
 
+int     vector_contains( vector* v , int val ){
+    for( int i = 0 ; i < v->size ; i++ )
+        if( (v->values[i]).int_value == val ) 
+            return 1;
+    return 0;
+}
 
 void vector_pop_back( vector* v , int amount ){
     if( v->size <= 0 ) return;
@@ -88,10 +94,9 @@ void vector_resize( vector* v , int new_size ){
     }
 }
 
-void vector_free( vector* v ){
+void vector_clean( vector* v ){
     if(v){
-        v->size = 0;
-        v->capacity = 0;
         if(v->values)free(v->values);
+        *v = empty_vector;
     }
 }
