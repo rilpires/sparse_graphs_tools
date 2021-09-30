@@ -39,7 +39,7 @@ int main( int argc , char **argv ){
     } else if( strcmp(topology,"-star")==0 ){
         graph_init(&g , TOPOLOGY_STAR , &data );
     } else {
-        printf("Unknow topology \"%s\".\n\n",topology);
+        printf("Unknown topology \"%s\".\n\n",topology);
         print_help();
         return 1;
     }
