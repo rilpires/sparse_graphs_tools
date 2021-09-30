@@ -39,7 +39,7 @@ void _fill_bridges( graph *g ){
         m += g->adjs.values[i].vec_value->size;
     }
     m /= 2;
-    printf("m=%f n\n" , ((float)m)/n );
+    //printf("m=%f n\n" , ((float)m)/n );
     vector_clean(&(g->bridges));
 
     vector_resize( &g->original_to_aux , n );
