@@ -51,21 +51,20 @@ void vector_pop_back( vector* v , int amount ){
     v->size -= amount ;
     if( (v->size>0) && (v->capacity/v->size >= 2) ){
 
-        v->capacity = v->capacity/2;
-        if(v->capacity > 0 ){
-            vector_value* old_values = v->values;
-            vector_value* new_values = malloc(sizeof(v->values[0])*(v->capacity) );
-            for( int i = 0 ; i < v->size ; i++ )
-                new_values[i] = old_values[i];
-            v->values = new_values;
-            free(old_values);
-        } else {
-            free(v->values);
-        }
+        while(v->capacity > 2*v->size) 
+            v->capacity /= 2;
+        
+        vector_value* old_values = v->values;
+        vector_value* new_values = malloc(sizeof(v->values[0])*(v->capacity) );
+        for( int i = 0 ; i < v->size ; i++ )
+            new_values[i] = old_values[i];
+        v->values = new_values;
+        free(old_values);
 
     } else if (v->size==0){
         v->capacity = 0;
-        free(v->values);
+        if(v->values) free(v->values);
+        v->values = NULL;
     }
 }
 

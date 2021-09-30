@@ -24,9 +24,7 @@ int main( int argc , char **argv ){
         print_help();
     }
 
-    
     strcpy( topology , argv[1] );
-
     for( int i = 2 ; i < argc ; i++ )
         vector_push_back_int( &data , atoi(argv[i]) );
 
