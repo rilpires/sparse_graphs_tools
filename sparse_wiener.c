@@ -36,6 +36,8 @@ int main( int argc , char **argv ){
         graph_init(&g , TOPOLOGY_THETA_GRAPH , &data );
     } else if( strcmp(topology,"-complete")==0 ){
         graph_init(&g , TOPOLOGY_COMPLETE_GRAPH , &data );
+    } else if( strcmp(topology,"-tetrahedron")==0 ){
+        graph_init(&g , TOPOLOGY_TETRAHEDRON , &data );
     } else if( strcmp(topology,"-star")==0 ){
         graph_init(&g , TOPOLOGY_STAR , &data );
     } else {

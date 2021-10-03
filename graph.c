@@ -101,6 +101,71 @@ void graph_init( graph* g , int topology , vector* data){
             graph_connect_vertices_safe( g , rand()%n , rand()%n );
     }break;
 
+    case TOPOLOGY_TETRAHEDRON:{
+        int n = 4;
+        int m = data->size;
+        int open_index = 4;
+        for( int i = 0 ; i < m ; i++ )
+            n += vector_get_int(data,i);
+        _graph_init(g,n);
+
+        int A = vector_get_int( data , 0 );
+        int B = vector_get_int( data , 1 );
+        int C = vector_get_int( data , 2 );
+        int D = vector_get_int( data , 3 );
+        int E = vector_get_int( data , 4 );
+        int F = vector_get_int( data , 5 );
+
+        // edge A, between 0-1
+        if(A>0){
+            graph_connect_vertices( g , 0 , open_index );
+            for( int i = 1 ; i < A ; i++ , open_index++ )
+                graph_connect_vertices( g , open_index , open_index+1 );
+            graph_connect_vertices( g , open_index++ , 1 );
+        } else graph_connect_vertices( g , 0 , 1 );
+        
+        // edge B, between 0-2
+        if(B>0){
+            graph_connect_vertices( g , 0 , open_index );
+            for( int i = 1 ; i < B ; i++ , open_index++ )
+                graph_connect_vertices( g , open_index , open_index+1 );
+            graph_connect_vertices( g , open_index++ , 2 );
+        } else graph_connect_vertices( g , 0 , 2 );
+        
+        // edge C, between 0-3
+        if(C>0){
+            graph_connect_vertices( g , 0 , open_index );
+            for( int i = 1 ; i < C ; i++ , open_index++ )
+                graph_connect_vertices( g , open_index , open_index+1 );
+            graph_connect_vertices( g , open_index++ , 3 );
+        } else graph_connect_vertices( g , 0 , 3 );
+        
+        // edge D, between 1-2
+        if(D>0){
+            graph_connect_vertices( g , 1 , open_index );
+            for( int i = 1 ; i < D ; i++ , open_index++ )
+                graph_connect_vertices( g , open_index , open_index+1 );
+            graph_connect_vertices( g , open_index++ , 2 );
+        } else graph_connect_vertices( g , 1 , 2 );
+        
+        // edge E, between 2-3
+        if(E>0){
+            graph_connect_vertices( g , 2 , open_index );
+            for( int i = 1 ; i < E ; i++ , open_index++ )
+                graph_connect_vertices( g , open_index , open_index+1 );
+            graph_connect_vertices( g , open_index++ , 3 );
+        } else graph_connect_vertices( g , 2 , 3 );
+        
+        // edge F, between 3-1
+        if(F>0){
+            graph_connect_vertices( g , 3 , open_index );
+            for( int i = 1 ; i < F ; i++ , open_index++ )
+                graph_connect_vertices( g , open_index , open_index+1 );
+            graph_connect_vertices( g , open_index++ , 1 );
+        } else graph_connect_vertices( g , 3 , 1 );
+
+    }break;
+
     case TOPOLOGY_RANDOM:{
         int n = vector_get_int(data,0);
         _graph_init(g,n);
