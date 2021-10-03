@@ -59,5 +59,6 @@ void print_help(){
     printf("-theta              Theta-graph topology. [DATA] then should be a sequence of m numbers, each representing the length of a bridge \n");
     printf("-complete           A complete graph. [DATA] then should be simply the number of vertices.\n");
     printf("-star               Star topology. [DATA] then should be a sequence of numbers, each representing the length of a bridge \n");
+    printf("-tetrahedron        Tetrahedron topology. [DATA] then should be a sequence of 6 numbers, each representing the amount of vertices in each bridge \n");
     exit(0);
 }
