@@ -31,6 +31,11 @@ void graph_init( graph* g , int topology , vector* data){
     switch (topology)
     {
 
+    case TOPOLOGY_EMPTY:{
+        int n = vector_get_int(data,0);
+        _graph_init(g,n);
+    }break;
+
     case TOPOLOGY_CIRCULAR:{
         int n = vector_get_int(data,0);
         _graph_init(g,n);
@@ -140,29 +145,29 @@ void graph_init( graph* g , int topology , vector* data){
             graph_connect_vertices( g , open_index++ , 3 );
         } else graph_connect_vertices( g , 0 , 3 );
         
-        // edge D, between 1-2
+        // edge D, between 2-3
         if(D>0){
-            graph_connect_vertices( g , 1 , open_index );
-            for( int i = 1 ; i < D ; i++ , open_index++ )
-                graph_connect_vertices( g , open_index , open_index+1 );
-            graph_connect_vertices( g , open_index++ , 2 );
-        } else graph_connect_vertices( g , 1 , 2 );
-        
-        // edge E, between 2-3
-        if(E>0){
             graph_connect_vertices( g , 2 , open_index );
-            for( int i = 1 ; i < E ; i++ , open_index++ )
+            for( int i = 1 ; i < D ; i++ , open_index++ )
                 graph_connect_vertices( g , open_index , open_index+1 );
             graph_connect_vertices( g , open_index++ , 3 );
         } else graph_connect_vertices( g , 2 , 3 );
         
-        // edge F, between 3-1
+        // edge E, between 1-3
+        if(E>0){
+            graph_connect_vertices( g , 1 , open_index );
+            for( int i = 1 ; i < E ; i++ , open_index++ )
+                graph_connect_vertices( g , open_index , open_index+1 );
+            graph_connect_vertices( g , open_index++ , 3 );
+        } else graph_connect_vertices( g , 1 , 3 );
+        
+        // edge F, between 1-2
         if(F>0){
-            graph_connect_vertices( g , 3 , open_index );
+            graph_connect_vertices( g , 1 , open_index );
             for( int i = 1 ; i < F ; i++ , open_index++ )
                 graph_connect_vertices( g , open_index , open_index+1 );
-            graph_connect_vertices( g , open_index++ , 1 );
-        } else graph_connect_vertices( g , 3 , 1 );
+            graph_connect_vertices( g , open_index++ , 2 );
+        } else graph_connect_vertices( g , 1 , 2 );
 
     }break;
 

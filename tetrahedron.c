@@ -21,10 +21,10 @@ int main( int argc , char** argv ){
     }
 
     int min_W = 0x7FFFFFFF;
-    vector min_data = empty_vector;
+    vector min_datas = empty_vector;
 
-    for( int X = 0 ; X <= N/2 ; X++ ){
-        int Y = N-X;
+    for( int X = 0 ; X <= (N-4)/2 ; X++ ){
+        int Y = (N-4)-X;
         vector vx = empty_vector;
         vector vy = empty_vector;
 
@@ -112,12 +112,23 @@ int main( int argc , char** argv ){
                 int W_g6 = W(&g6);
 
                 #define PRINT_G(g) printf("W(g) = %d \t [%d %d %d %d %d %d]\n" , W_##g , vector_get_int(&g##_data,0) , vector_get_int(&g##_data,1) , vector_get_int(&g##_data,2) , vector_get_int(&g##_data,3) , vector_get_int(&g##_data,4) , vector_get_int(&g##_data,5) );
-                #define CHECK_FOR_MIN(g)                                            \
-                if( W_##g < min_W ){                                                \
-                    min_W = W_##g;                                                  \
-                    vector_clean(&min_data);                                           \
-                    for(int k=0; k<6;k++)                                           \
-                        vector_push_back_int(&min_data,vector_get_int(&g##_data,k));   \
+                
+                #define CHECK_FOR_MIN(g)                                                \
+                if( W_##g < min_W ){                                                    \
+                    min_W = W_##g;                                                      \
+                    for( int k = 0 ; k < min_datas.size ; k++ ){                        \
+                        vector* min_data = vector_get_ptr(&min_datas,k);                \
+                        vector_clean(min_data);                                         \
+                        free(min_data);                                                 \
+                    }                                                                   \
+                    vector_clean(&min_datas);                                           \
+                }                                                                       \
+                if( min_W == W_##g ){                                                   \
+                    vector* min_data = malloc(sizeof(vector));                          \
+                    *min_data = empty_vector;                                           \
+                    for( int k = 0 ; k < 6 ; k++ )                                      \
+                        vector_push_back_int( min_data , vector_get_int(&g##_data,k) ); \
+                    vector_push_back_ptr(&min_datas,min_data);                          \
                 }
 
                 if(verbose){
@@ -151,6 +162,22 @@ int main( int argc , char** argv ){
 
     }
 
-    printf("min W(g) = %d \t [%d %d %d %d %d %d]\n" , min_W , vector_get_int(&min_data,0) , vector_get_int(&min_data,1) , vector_get_int(&min_data,2) , vector_get_int(&min_data,3) , vector_get_int(&min_data,4) , vector_get_int(&min_data,5) );
+    // Now, removing duplicated entries in min_datas... actually, turning the duplicated entries into NULL
+    for( int i = 0 ; i < min_datas.size ; i++ ){
+        for( int j = i+1 ; j < min_datas.size ; j++ ){
+            vector* v1 = vector_get_ptr(&min_datas,i);
+            vector* v2 = vector_get_ptr(&min_datas,j);
+            if( vector_compare(v1,v2)==0 ){
+                vector_set_ptr(&min_datas,j,NULL);
+                vector_clean(v2);
+                free(v2);
+            }
+        }
+    }
+
+    for( int i = 0 ; i < min_datas.size ; i++ ){
+        vector* min_data = vector_get_ptr(&min_datas,i);
+        if( min_data ) printf("min W(g) = %d \t [%d %d %d %d %d %d]\n" , min_W , vector_get_int(min_data,0) , vector_get_int(min_data,1) , vector_get_int(min_data,2) , vector_get_int(min_data,3) , vector_get_int(min_data,4) , vector_get_int(min_data,5) );
+    }
 
 }

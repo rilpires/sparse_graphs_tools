@@ -93,6 +93,17 @@ void vector_resize( vector* v , int new_size ){
     }
 }
 
+
+int vector_compare( vector* v1 , vector* v2 ){
+    if( v1 == v2 ) return 0;
+    if( v1 == NULL || v2 == NULL ) return 1;
+    if( v1->size != v2->size ) return 1;
+    for( int i = 0 ; i < v1->size ; i++ ){
+        if( vector_get_int(v1,i) != vector_get_int(v2,i) ) return 1;
+    }
+    return 0;
+}
+
 void vector_clean( vector* v ){
     if(v){
         if(v->values)free(v->values);

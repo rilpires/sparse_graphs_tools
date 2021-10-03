@@ -1,5 +1,5 @@
 
-default: partitions sparse_wiener tetrahedron thetagraph
+default: partitions sparse_wiener tetrahedron thetagraph four33 cup
 
 ifeq ($(DEBUG),TRUE)
 CFLAGS += -g
@@ -15,6 +15,7 @@ sparse_wiener: .FORCE
 partitions: .FORCE
 	$(CC) $(CFLAGS) partitions_main.c partitions.c vector.c -o $(@)
 
-thetagraph tetrahedron: .FORCE
+# Exploratory programs
+thetagraph tetrahedron four33 cup : .FORCE
 	$(CC) $(CFLAGS) $(@).c graph.c vector.c list.c wiener.c partitions.c -o $(@)
 

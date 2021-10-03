@@ -7,7 +7,8 @@
 
 enum TOPOLOGIES {
                                 // when initializing a graph with graph_init, 'data' is a vector in which...
-    TOPOLOGY_CIRCULAR ,         //  ... data[0] is the number of vertexs
+    TOPOLOGY_EMPTY ,            //  ... data[0] is the number of vertices, not a single edge present
+    TOPOLOGY_CIRCULAR ,         //  ... data[0] is the number of vertices
     TOPOLOGY_THETA_GRAPH ,      //  ... data[0],data[1],...,data[m-1] are the amount of vertex in each of the m-bridges
     TOPOLOGY_SINGLE_BRIDGE,     //  ... data[0] is the number of vertices
     TOPOLOGY_COMPLETE_GRAPH,    //  ... data[0] is the number of vertices
