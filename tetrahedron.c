@@ -177,7 +177,7 @@ int main( int argc , char** argv ){
 
     for( int i = 0 ; i < min_datas.size ; i++ ){
         vector* min_data = vector_get_ptr(&min_datas,i);
-        if( min_data ) printf("min W(g) = %d \t [%d %d %d %d %d %d]\n" , min_W , vector_get_int(min_data,0) , vector_get_int(min_data,1) , vector_get_int(min_data,2) , vector_get_int(min_data,3) , vector_get_int(min_data,4) , vector_get_int(min_data,5) );
+        if( min_data ) printf("min W(g) =\t%d \t [%d %d %d %d %d %d]\n" , min_W , vector_get_int(min_data,0) , vector_get_int(min_data,1) , vector_get_int(min_data,2) , vector_get_int(min_data,3) , vector_get_int(min_data,4) , vector_get_int(min_data,5) );
     }
 
 }

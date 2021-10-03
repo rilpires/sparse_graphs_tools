@@ -55,7 +55,7 @@ int main( int argc , char** argv ){
     
     for( int i = 0 ; i < min_datas.size ; i++ ){
         vector* min_data = vector_get_ptr(&min_datas,i);
-        printf("min W(g) = %d \t [ " , min_W );
+        printf("min W(g) =\t%d \t [ " , min_W );
         for( int j = 0 ; j < M ; j++ ){
             printf("%d " , vector_get_int(min_data,j));
         }
