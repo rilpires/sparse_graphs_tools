@@ -5,7 +5,7 @@ More usability (like importing custom graph data) will soon be added.
 
 The executable programs are:
 
-- `sparse_wiener`     (Used to calculate the Wiener index of any graph, altough it is optimized for sparse graphs)
+- `sparse_wiener`     (Used to calculate the Wiener index of any graph, although it is optimized for sparse graphs)
 - `partitions`        (Auxiliary tool to generate partitions of any given number)
 
 These programs below are used to explore the best wiener index of such topologies, which are all biconnecteds with (n+2) edges.
