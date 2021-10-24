@@ -14,7 +14,7 @@ enum TOPOLOGIES {
     TOPOLOGY_COMPLETE_GRAPH,    //  ... data[0] is the number of vertices
     TOPOLOGY_STAR ,             //  ... data[0],data[1],...,data[m-1] are the amount of vertex in each of the m star's edges
     TOPOLOGY_TETRAHEDRON ,      //  ... data[0...5] are the amount of vertex in each of the 6 bridges
-    TOPOLOGY_RANDOM ,           //  ... data[0] is the number of vertices
+    TOPOLOGY_RANDOM ,           //  ... data[0] is the number of vertices and data[1] is the seed
 };
 
 
@@ -29,7 +29,7 @@ typedef struct bridge {
 typedef struct graph {
     vector adjs; // 'adjs' is a vector of vectors!
 
-    unsigned int **dists;
+    unsigned int **dists; // used only in floyd-warshall alghrtm
 
     unsigned int **aux_dists; // dists regarding the degree>=3 vertices.
     vector bridges;     // vector of bridges 

@@ -2,11 +2,17 @@
 
 n=$1
 
-for topology in cup four33 tetrahedron; do
-    ./$topology $n | while read p; do
-        echo "$topology($n) $p"
-    done
-done;
+./tetrahedron $n | while read p; do
+    echo "tetrahedron($n) $p"
+done
+
+./four33 $n | while read p; do
+    echo "four33($n) $p"
+done
+
+./cup $n | while read p; do
+    echo "cup($n) $p"
+done
 
 ./thetagraph $n 4 | while read p; do
     echo "thetagraph($n) $p"

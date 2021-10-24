@@ -173,6 +173,7 @@ void graph_init( graph* g , int topology , vector* data){
 
     case TOPOLOGY_RANDOM:{
         int n = vector_get_int(data,0);
+        srand( (unsigned)vector_get_int(data,1) );
         _graph_init(g,n);
         while( !graph_is_connected(g) )
             graph_connect_vertices_safe( g , rand()%n , rand()%n );
