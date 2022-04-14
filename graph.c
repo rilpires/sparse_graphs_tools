@@ -253,6 +253,17 @@ void graph_clean( graph* g ){
     *g = empty_graph;
 }
 
+
+int  graph_edge_count( graph* g ){
+    int ret = 0;
+    int n = g->adjs.size;
+    for( int i = 0 ; i < n ; i++ ){
+        vector* v = vector_get_ptr( &(g->adjs),i);
+        ret += v->size;
+    }
+    return ret/2;
+}
+
 void graph_print( graph* g ){
     int n = g->adjs.size;
     

@@ -26,6 +26,11 @@ int     vector_get_int( vector* v , int index ){
 void    vector_set_int( vector* v , int index , int new_val ){
     v->values[index].int_value = new_val;
 }
+void    vector_int_fill( vector* v , int value ){
+    for( int i = 0 ; i < v->size ; i++ ){
+        v->values[i].int_value = value;
+    }
+}
 
 void vector_push_back_ptr( vector* v , void* new_ptr ){
     _vector_push_back(v);

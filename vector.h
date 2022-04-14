@@ -38,6 +38,7 @@ static const vector empty_vector = {
 void    vector_push_back_int( vector* v , int new_int );
 int     vector_get_int( vector* v , int index );
 void    vector_set_int( vector* v , int index , int new_val );
+void    vector_int_fill( vector* v , int value );
 
 void    vector_push_back_ptr( vector* v , void* new_ptr );
 void*   vector_get_ptr( vector* v , int index );

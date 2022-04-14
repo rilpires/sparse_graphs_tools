@@ -4,9 +4,8 @@
 
 #include "wiener.h"
 
-
-
-void _fill_dist_matrix( unsigned int **dists , int n ){
+void _fill_dist_matrix_floyd_warshall( unsigned int** dists , int n ){
+    
     for( int k = 0 ; k < n ; k++ ){
         for( int i = 0 ; i < n ; i++ ){
             for( int j = i+1 ; j < n ; j++ ){
@@ -26,6 +25,63 @@ void _fill_dist_matrix( unsigned int **dists , int n ){
         }   
     }
 }
+
+
+void _fill_dist_matrix_dijkstra( unsigned int** dists , vector* adjs ){
+    
+    int n = adjs->size;
+
+    for( int i = 0 ; i < n ; i++ ){
+        // Applying dijkstra here with vertex 'i' as source
+    
+        vector *i_adj_vector = adjs->values[i].vec_value;
+        list discovery_queue = empty_list;
+        vector visiteds = empty_vector;
+        vector_resize( &visiteds , n );
+        vector_int_fill( &visiteds , 0 );
+        vector_set_int( &visiteds , i , 1 );
+
+        for( int i_adj_index = 0 ; i_adj_index < i_adj_vector->size ; i_adj_index++ ){
+            int j = vector_get_int( i_adj_vector, i_adj_index );
+            list_push_back( &discovery_queue , j );
+            vector_set_int( &visiteds , j , 1 );
+        }
+
+        while( discovery_queue.first ){
+            
+            int j = discovery_queue.first->val;
+            vector *j_adj_vector = adjs->values[j].vec_value;
+            list_pop_front( &discovery_queue );
+
+            for( int j_adj_index = 0 ; j_adj_index < j_adj_vector->size ; j_adj_index++ ){
+                int k = vector_get_int(j_adj_vector,j_adj_index);
+                unsigned int old_distance = ((i<k)?(dists[i][k]):(dists[k][i]));
+                unsigned int new_distance = ((i<j)?(dists[i][j]):(dists[j][i])) +   
+                                            ((j<k)?(dists[j][k]):(dists[k][j]));
+                
+                
+                if( (new_distance<old_distance)||( (i!=k) && (old_distance==0)) ) {
+                    if(i<k) dists[i][k] = new_distance;
+                    else    dists[k][i] = new_distance;
+                }
+
+                if( vector_get_int( &visiteds , k )==0 ){
+                    list_push_back( &discovery_queue , k );
+                    vector_set_int( &visiteds , k , 1 );
+                }
+                
+            }
+
+            
+        }
+
+        list_clean( &discovery_queue );
+        vector_clean( &visiteds );
+
+    }
+
+}
+
 
 void _fill_bridges( graph *g ){
 
@@ -107,7 +163,81 @@ void _fill_bridges( graph *g ){
 }
 
 
-int W_floyd_warshall( graph *g ){
+// sum from a single bridge
+int _W_b( bridge *b1 , unsigned int d ){
+
+    int n = b1->vertices.size;
+    int ret;
+
+    int k = (n-1+d)/2;
+    k = CLAMP(k,1,n-1);
+    int p1 = (n*k*(k+1))/2;
+    int p2 = ( n*n - n + d*n )*( n - k - 1);
+    int p3 = ((1-d-2*n)*(n+k)*(n-k-1))/2;
+    int p4 = SQUARED_SUM(n-1) -2*SQUARED_SUM(k);
+    ret = p1 + p2 + p3 + p4;
+    
+    return ret;
+}
+// sum between a bridge and a central
+int _W_bc( bridge *b1 , unsigned int d1 , unsigned int d2 ){
+    int ret = 0;
+    int n = b1->vertices.size;
+    int dx1 = MIN( d1 , n-1+d2);
+    int dx2 = MIN( d2 , n-1+d1);
+    int a = MIN(dx1,dx2);
+    int b = MAX(dx1,dx2);
+    int i = (n-ABS(a-b))/2;
+    int na = n - i;
+    int nb = n - na;
+    ret = 2*a*na + na*na - na;
+    ret += 2*b*nb + nb*nb - nb;
+    ret /= 2;
+    return ret;
+}
+// sum between 2 bridges
+int _W_bb( bridge *b1 , bridge *b2 , unsigned int da , unsigned int db , unsigned int dc , unsigned int dd ){
+    if( b1->vertices.size < b2->vertices.size ){
+        return _W_bb(b2,b1,da,dc,db,dd); // when flipping, swap db<=>dc
+    }
+
+    int ret = 0;
+    int n1 = b1->vertices.size;
+    int n2 = b2->vertices.size;
+    for( int i = 0 ; i < n2 ; i++ ){
+        int d1 = MIN( da + i , dc + n2 - 1 - i );
+        int d2 = MIN( db + i , dd + n2 - 1 - i );
+        ret += _W_bc( b1 , d1 , d2 );
+    }
+    return ret;
+}
+
+
+int W( graph *g , enum WIENER_METHOD which_method ){
+    int ret;
+    switch( which_method ){
+        case WIENER_METHOD_FLOYD_WARSHALL:
+        case WIENER_METHOD_MULTIPLE_DIJKSTRAS:
+            ret = W_traditional(g,which_method);
+            break;
+        case WIENER_METHOD_SPARSE_METHOD:
+        default:
+            ret = W_sparse(g);
+            break;
+    }
+    //printf("dist matrix:\n");
+    //int n = g->adjs.size;
+    //for( int i = 0 ; i < n ; i++ ){
+    //    for( int j = 0 ; j < n ; j++ ){
+    //        printf("%d " , g->dists[i][j] );
+    //    }
+    //    printf("\n");
+    //}
+    return ret;
+}
+
+int W_traditional( graph *g , enum WIENER_METHOD which_method ){
+    
     int n = g->adjs.size;
     
     if( g->dists ){
@@ -117,10 +247,10 @@ int W_floyd_warshall( graph *g ){
         free( g->dists );
     }
 
-    g->dists = malloc( sizeof(g->dists[0]) * n );
+    g->dists = malloc( sizeof(unsigned int*) * n );
     for( int i = 0 ; i < n ; i++ ){
-        g->dists[i] = malloc( sizeof(g->dists[0][0]) * n );
-        memset(g->dists[i] , 0 , sizeof(g->dists[0][0]) * n );
+        g->dists[i] = malloc( sizeof(unsigned int) * n );
+        memset(g->dists[i] , 0 , sizeof(unsigned int) * n );
     }
 
     for( int i = 0 ; i < n ; i++ ){
@@ -130,21 +260,33 @@ int W_floyd_warshall( graph *g ){
         }
     }
 
-    
-    _fill_dist_matrix( (g->dists) , n );
+    switch (which_method)
+    {
+    case WIENER_METHOD_FLOYD_WARSHALL:
+        _fill_dist_matrix_floyd_warshall( g->dists , n );
+        break;
+    case WIENER_METHOD_MULTIPLE_DIJKSTRAS:
+        _fill_dist_matrix_dijkstra( g->dists , &(g->adjs) );
+        break;
+    default:
+        printf("ERROR - this case isn't supposed to happen");
+        break;
+    }
     
     
     int ret = 0 ;
     for( int i = 0 ; i < n ; i++ ){
         for( int j = i+1 ; j < n ; j++ ){
+            if( g->dists[i][j] > 10 ){
+                printf("achei um");
+            }
             ret += g->dists[i][j];
         }
     }
-
     return 2*ret;
 }
 
-int W( graph *g ){
+int W_sparse( graph *g ){
     int ret = 0;
     int n = g->adjs.size;
 
@@ -195,7 +337,8 @@ int W( graph *g ){
             }
         }
     }
-    _fill_dist_matrix( g->aux_dists , aux_n );
+    
+    _fill_dist_matrix_floyd_warshall( g->aux_dists , aux_n );
 
     for( int i = 0 ; i < aux_n ; i++ )
     for( int j = i+1 ; j < aux_n ; j++ ){
@@ -219,7 +362,7 @@ int W( graph *g ){
                 int aux_available_extremity = vector_get_int( &g->original_to_aux , available_extremity );
                 int d1 = 1+MIN_DIST(g->aux_dists,aux_available_extremity,aux_i);
                 int d2 = d1 + br->vertices.size + 2 ;
-                ret += 2*W_bc( br , d1 , d2 );
+                ret += 2*_W_bc( br , d1 , d2 );
             }
             d = n+1; // d=n+1 guarantees that it wont be considered later on
         } else {
@@ -228,12 +371,12 @@ int W( graph *g ){
             for( int i = 0 ; i < aux_n ; i++ ){
                 int d1 = 1+MIN_DIST(g->aux_dists,aux_extremity_0,i);
                 int d2 = 1+MIN_DIST(g->aux_dists,aux_extremity_1,i);
-                ret += 2*W_bc( br , d1 , d2 );
+                ret += 2*_W_bc( br , d1 , d2 );
             }
             d = 2+MIN_DIST(g->aux_dists,aux_extremity_0,aux_extremity_1);
         }
         
-        ret += 2*W_b( br , d );
+        ret += 2*_W_b( br , d );
     }
     for( int b1 = 0 ; b1 < g->bridges.size ; b1++ ){
         for( int b2 = b1+1 ; b2 < g->bridges.size ; b2++ ){
@@ -254,69 +397,9 @@ int W( graph *g ){
             int db = (extremity_01 == -1||extremity_10 == -1) ? (n+2) : (2+MIN_DIST( g->aux_dists , aux_extremity_01 , aux_extremity_10 ));
             int dc = (extremity_00 == -1||extremity_11 == -1) ? (n+2) : (2+MIN_DIST( g->aux_dists , aux_extremity_00 , aux_extremity_11 ));
             int dd = (extremity_01 == -1||extremity_11 == -1) ? (n+2) : (2+MIN_DIST( g->aux_dists , aux_extremity_01 , aux_extremity_11 ));
-            ret += 2*W_bb( br1 , br2 , da , db , dc , dd );
+            ret += 2*_W_bb( br1 , br2 , da , db , dc , dd );
         }
     }
 
-    // printf("aux table:");
-    // for( int aux_i = 0 ; aux_i < aux_n ; aux_i ++ ){
-    //     printf("[%d]:\t%d\n", aux_i , g->aux_to_original.values[aux_i].int_value );
-    // }
-    // printf("aux_dists:\n");
-    // for( int i = 0 ; i < aux_n ; i++ ){
-    //     for( int j = 0 ; j < aux_n ; j++ ){
-    //         printf("%d " , g->aux_dists[i][j] );
-    //     }
-    //     printf("\n");
-    // }
-
     return ret;
 }
-
-
-int W_b( bridge *b1 , unsigned int d ){
-
-    int n = b1->vertices.size;
-    int ret;
-
-    int k = (n-1+d)/2;
-    k = CLAMP(k,1,n-1);
-    int p1 = (n*k*(k+1))/2;
-    int p2 = ( n*n - n + d*n )*( n - k - 1);
-    int p3 = ((1-d-2*n)*(n+k)*(n-k-1))/2;
-    int p4 = SQUARED_SUM(n-1) -2*SQUARED_SUM(k);
-    ret = p1 + p2 + p3 + p4;
-    
-    return ret;
-}
-int W_bc( bridge *b1 , unsigned int d1 , unsigned int d2 ){
-    int ret = 0;
-    int n = b1->vertices.size;
-    int dx1 = MIN( d1 , n-1+d2);
-    int dx2 = MIN( d2 , n-1+d1);
-    int a = MIN(dx1,dx2);
-    int b = MAX(dx1,dx2);
-    int i = (n-ABS(a-b))/2;
-    int na = n - i;
-    int nb = n - na;
-    ret = 2*a*na + na*na - na;
-    ret += 2*b*nb + nb*nb - nb;
-    ret /= 2;
-    return ret;
-}
-int W_bb( bridge *b1 , bridge *b2 , unsigned int da , unsigned int db , unsigned int dc , unsigned int dd ){
-    if( b1->vertices.size < b2->vertices.size ){
-        return W_bb(b2,b1,da,dc,db,dd); // when flipping, swap db<=>dc
-    }
-
-    int ret = 0;
-    int n1 = b1->vertices.size;
-    int n2 = b2->vertices.size;
-    for( int i = 0 ; i < n2 ; i++ ){
-        int d1 = MIN( da + i , dc + n2 - 1 - i );
-        int d2 = MIN( db + i , dd + n2 - 1 - i );
-        ret += W_bc( b1 , d1 , d2 );
-    }
-    return ret;
-}
-

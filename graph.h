@@ -53,6 +53,7 @@ void graph_init( graph* g , int topology , vector* data );
 void graph_clean( graph* g );
 void graph_print( graph* g );
 int  graph_is_connected( graph* g );
+int  graph_edge_count( graph* g );
 void graph_connect_vertices( graph* g , int v1 , int v2 );
 void graph_connect_vertices_safe( graph* g , int v1 , int v2 );
 

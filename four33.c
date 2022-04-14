@@ -89,7 +89,7 @@ int main( int argc , char** argv ){
                         graph_connect_vertices(&g , open_index++ , 2 );
                     }
 
-                    int Wg = W(&g);
+                    int Wg = W(&g , WIENER_METHOD_SPARSE_METHOD);
 
                     
                     if( min_W > Wg ){

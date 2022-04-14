@@ -17,7 +17,7 @@ int main( int argc , char **argv ){
     char topology[32];
     vector data = empty_vector;
     graph g = empty_graph;
-    int use_floyd_warshall=0;
+    int which_method = WIENER_METHOD_SPARSE_METHOD;
     int show_time=0;
     struct timeval t0,t1;
 
@@ -28,7 +28,13 @@ int main( int argc , char **argv ){
             show_time = 1;
         }
         else if( strcmp(argv[0],"--floyd")==0 || strcmp(argv[0],"-f")==0 ){
-            use_floyd_warshall = 1;
+            which_method = WIENER_METHOD_FLOYD_WARSHALL;
+        }
+        else if( strcmp(argv[0],"--sparse")==0 || strcmp(argv[0],"-s")==0 ){
+            which_method = WIENER_METHOD_SPARSE_METHOD;
+        }
+        else if( strcmp(argv[0],"--dijkstra")==0 || strcmp(argv[0],"-d")==0 ){
+            which_method = WIENER_METHOD_MULTIPLE_DIJKSTRAS;
         }
         else{
             printf("Unrecognized option: %s\n\n",argv[0]);
@@ -64,14 +70,14 @@ int main( int argc , char **argv ){
 
     int ret;
     gettimeofday(&t0, 0);
-    if( use_floyd_warshall ) ret = W_floyd_warshall(&g);
-    else ret = W(&g);
+    ret = W( &g , which_method );
     gettimeofday(&t1, 0);
     
     printf( "%d\n" , ret );
     if(show_time){
         float elapsed = (t1.tv_sec - t0.tv_sec)*1000.0f + (t1.tv_usec-t0.tv_usec)/1000.0f;
-        printf("elapsed time: %f ms\n" , elapsed );
+        printf("elapsed time: %.3f ms\n" , elapsed );
+        if(strcmp(topology,"random")==0)printf("n/m ratio = %.3f\n" , ((float)graph_edge_count(&g))/(g.adjs.size) );
     }
     
     return 0;
@@ -82,7 +88,9 @@ void print_help(){
     printf("sparse_wiener [OPTIONS] <TOPOLOGY> <DATA>\n\n");
     printf("\n[OPTIONS]:\n");
     printf("--verbose , -v      Show time log\n");
-    printf("--floyd , -f        Use Floyd-Warshall algorithm(not default)\n");
+    printf("--sparse , -s       Use Sparse oriented algorithm (default)\n");
+    printf("--dijkstra , -d     Use multiple Dijkstra algorithms\n");
+    printf("--floyd , -f        Use Floyd-Warshall algorithm\n");
     printf("\n<TOPOLOGY>:\n");
     printf("circular            Circular topology. <DATA> then should be simply the number of vertices. \n");
     printf("theta               Theta-graph topology. <DATA> then should be a sequence of m numbers, each representing the length of a bridge \n");

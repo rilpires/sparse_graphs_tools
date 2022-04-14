@@ -104,12 +104,12 @@ int main( int argc , char** argv ){
                 graph_init( &g5 , TOPOLOGY_TETRAHEDRON , &g5_data );
                 graph_init( &g6 , TOPOLOGY_TETRAHEDRON , &g6_data );
 
-                int W_g1 = W(&g1);
-                int W_g2 = W(&g2);
-                int W_g3 = W(&g3);
-                int W_g4 = W(&g4);
-                int W_g5 = W(&g5);
-                int W_g6 = W(&g6);
+                int W_g1 = W(&g1 , WIENER_METHOD_SPARSE_METHOD );
+                int W_g2 = W(&g2 , WIENER_METHOD_SPARSE_METHOD );
+                int W_g3 = W(&g3 , WIENER_METHOD_SPARSE_METHOD );
+                int W_g4 = W(&g4 , WIENER_METHOD_SPARSE_METHOD );
+                int W_g5 = W(&g5 , WIENER_METHOD_SPARSE_METHOD );
+                int W_g6 = W(&g6 , WIENER_METHOD_SPARSE_METHOD );
 
                 #define PRINT_G(g) printf("W(g) = %d \t [%d %d %d %d %d %d]\n" , W_##g , vector_get_int(&g##_data,0) , vector_get_int(&g##_data,1) , vector_get_int(&g##_data,2) , vector_get_int(&g##_data,3) , vector_get_int(&g##_data,4) , vector_get_int(&g##_data,5) );
                 
